@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Сурагч — Ургамлын ургал эрхтнүүд 🌱</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<style>
+:root{
+  --bg1:#d1fae5;--bg2:#bae6fd;--bg3:#fef08a;--bg4:#fbcfe8;
+  --primary:#10b981;--primary-d:#047857;--accent:#6366f1;--sky:#0ea5e9;
+  --warm:#f59e0b;--pink:#ec4899;--danger:#ef4444;
+  --ink:#1e293b;--muted:#64748b;--card:rgba(255,255,255,0.92);
+  --shadow:0 14px 32px rgba(15,23,42,0.1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{
+  margin:0;font-family:'Nunito',system-ui,sans-serif;color:var(--ink);min-height:100vh;
+  background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3),var(--bg4));
+  background-size:350% 350%;animation:bgMove 16s ease infinite;padding-bottom:44px;
+  overflow-x:hidden;
+}
+@keyframes bgMove{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+.float-bg{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.fl{position:absolute;font-size:28px;opacity:.26;animation:floatUp 15s linear infinite}
+.fl:nth-child(1){left:6%;animation-duration:14s;animation-delay:0s}
+.fl:nth-child(2){left:24%;animation-duration:18s;animation-delay:-4s;font-size:34px}
+.fl:nth-child(3){left:48%;animation-duration:13s;animation-delay:-7s}
+.fl:nth-child(4){left:72%;animation-duration:17s;animation-delay:-2s;font-size:32px}
+.fl:nth-child(5){left:88%;animation-duration:15s;animation-delay:-9s}
+@keyframes floatUp{
+  0%{transform:translateY(105vh) rotate(0deg) scale(.9)}
+  50%{transform:translateY(50vh) rotate(180deg) scale(1.1)}
+  100%{transform:translateY(-15vh) rotate(360deg) scale(.9)}
+}
+
+#fxCanvas{position:fixed;inset:0;pointer-events:none;z-index:999}
+main{position:relative;z-index:1;max-width:780px;margin:0 auto;padding:14px}
+
+.topbar{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--card);backdrop-filter:blur(14px);border:2px solid rgba(255,255,255,.95);
+  border-radius:24px;padding:10px 16px;box-shadow:var(--shadow);margin-bottom:14px;
+  animation:slideDown .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideDown{from{opacity:0;transform:translateY(-16px)}to{opacity:1;transform:translateY(0)}}
+.me-pill{display:flex;align-items:center;gap:10px;font-weight:900;font-size:16px}
+.me-pill .av{
+  font-size:28px;width:42px;height:42px;border-radius:50%;
+  background:linear-gradient(135deg,#fef08a,#bbf7d0);
+  display:inline-flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 10px rgba(16,185,129,.22);animation:wiggle 3s ease-in-out infinite;
+}
+@keyframes wiggle{0%,100%{transform:rotate(-5deg)}50%{transform:rotate(6deg)}}
+
+.conn-badge{
+  font-size:12px;font-weight:900;padding:6px 12px;border-radius:999px;
+  background:#dcfce7;color:#15803d;border:2px solid #86efac;
+}
+.conn-badge.wait{background:#fef3c7;color:#b45309;border-color:#fde047}
+
+.card{
+  background:var(--card);backdrop-filter:blur(14px);border:3px solid rgba(255,255,255,.95);
+  border-radius:28px;padding:20px;margin-bottom:16px;box-shadow:var(--shadow);
+  animation:popCard .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes popCard{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:translateY(0) scale(1)}}
+h1,h2,h3{margin:0 0 10px;color:var(--primary-d);font-weight:900}
+h2{font-size:23px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.join-wrap{text-align:center;padding:28px 16px}
+.big-avatar{
+  width:130px;height:130px;margin:0 auto 16px;border-radius:50%;
+  background:linear-gradient(135deg,#fde047,#6ee7b7,#93c5fd);
+  display:flex;align-items:center;justify-content:center;
+  font-size:70px;box-shadow:0 14px 30px rgba(16,185,129,.28);border:5px solid #fff;
+  animation:popBounce 2.2s ease-in-out infinite;
+}
+@keyframes popBounce{0%,100%{transform:translateY(0) scale(1)}50%{transform:translateY(-10px) scale(1.06)}}
+
+input.big-in{
+  width:100%;max-width:340px;font:inherit;font-size:19px;font-weight:800;text-align:center;
+  padding:14px 18px;border-radius:20px;border:3px solid #cbd5e1;outline:none;margin:12px auto;display:block;
+  background:#fff;transition:.2s;
+}
+input.big-in:focus{border-color:var(--sky);box-shadow:0 0 0 5px rgba(14,165,233,.2);transform:scale(1.02)}
+
+button{
+  font:inherit;font-weight:900;border:2px solid #e2e8f0;border-bottom:5px solid #cbd5e1;
+  border-radius:18px;padding:11px 20px;cursor:pointer;
+  background:#fff;color:var(--ink);
+  transition:transform .12s, box-shadow .15s, background .2s;
+}
+button:hover{transform:translateY(-2px)}
+button:active{transform:translateY(3px);border-bottom-width:2px}
+button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+
+button.primary{
+  background:linear-gradient(135deg,#10b981,#0ea5e9);color:#fff;
+  border:none;border-bottom:5px solid #0369a1;
+  box-shadow:0 10px 22px rgba(14,165,233,.32);
+}
+button.primary:active{border-bottom-width:2px}
+button.picked{
+  background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;
+  border-color:#4f46e5;border-bottom-color:#3730a3;
+}
+button.on{
+  background:linear-gradient(135deg,#10b981,#22c55e);color:#fff;
+  border-color:#059669;border-bottom-color:#047857;
+}
+button.bad{
+  background:#fee2e2!important;color:#b91c1c!important;
+  border:2px solid #f87171!important;border-bottom:5px solid #dc2626!important;
+}
+
+.board-video{
+  margin:14px 0;padding:24px 18px;text-align:center;border-radius:24px;
+  background:linear-gradient(135deg,#eef2ff,#e0f2fe,#fef3c7);
+  border:3px dashed #6366f1;position:relative;overflow:hidden;
+  box-shadow:inset 0 0 0 4px rgba(255,255,255,.6);
+}
+.board-video .bv-ico{font-size:58px;display:inline-block;margin-bottom:6px;animation:bob 1.8s ease-in-out infinite}
+.board-video .bv-title{font-size:21px;font-weight:900;color:#4338ca;margin-bottom:4px}
+.board-video .bv-sub{font-size:14px;font-weight:700;color:#475569}
+
+.ms{margin:10px 0}
+.ms img{
+  width:100%;max-height:360px;border-radius:20px;border:3px solid #e2e8f0;
+  object-fit:contain;background:#fff;display:block;box-shadow:0 6px 16px rgba(15,23,42,.06);
+}
+
+.prog-wrap{background:#e2e8f0;height:14px;border-radius:999px;overflow:hidden;margin:8px 0 4px;border:2px solid #fff}
+.prog-fill{
+  height:100%;background:linear-gradient(90deg,#10b981,#38bdf8,#818cf8);
+  background-size:200% 100%;animation:shimmer 2.5s linear infinite;
+  border-radius:999px;transition:width .4s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:10px 0 4px}
+.tabs button{flex:1;min-width:95px;padding:11px 12px;font-size:15px}
+.q-title{font-size:17px;font-weight:900;color:#0f172a;margin-bottom:10px;line-height:1.45}
+
+.opt-grid{display:grid;gap:10px;margin-top:10px}
+.opt{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  padding:12px 14px;font-size:16px;font-weight:800;border-radius:20px;
+}
+.opt .letter{
+  flex:0 0 36px;height:36px;border-radius:12px;
+  background:#e0f2fe;color:#0369a1;font-weight:900;font-size:16px;
+  display:flex;align-items:center;justify-content:center;
+}
+.opt.picked .letter,.opt.on .letter{background:rgba(255,255,255,.28);color:#fff}
+.opt.bad .letter{background:#fecaca;color:#b91c1c}
+.opt .check-ic{margin-left:auto;font-size:22px}
+
+.match-row{
+  background:#f8fafc;border:2px solid #e2e8f0;border-radius:20px;
+  padding:12px 14px;margin:10px 0;transition:.2s;
+}
+.match-row.ok-row{background:#f0fdf4;border-color:#86efac}
+.match-row.bad-row{background:#fef2f2;border-color:#fca5a5}
+.match-q{font-weight:800;font-size:15px;margin-bottom:10px;line-height:1.45}
+.match-picks{display:flex;flex-wrap:wrap;gap:8px}
+.mpick{padding:8px 13px;font-size:14px;border-radius:14px;font-weight:800;border-width:2px;border-bottom-width:4px}
+.mpick.picked{background:linear-gradient(135deg,#6366f1,#3b82f6);color:#fff;border-color:#4f46e5;border-bottom-color:#3730a3}
+.mpick.ok-pick{background:linear-gradient(135deg,#10b981,#22c55e);color:#fff;border-color:#059669;border-bottom-color:#047857}
+.mpick.bad-pick{background:#fee2e2;color:#b91c1c;border-color:#f87171;border-bottom-color:#dc2626}
+
+.drag-hint{
+  font-size:13px;font-weight:800;color:#4f46e5;background:#eef2ff;
+  display:inline-block;padding:5px 12px;border-radius:999px;margin-bottom:8px;
+}
+.word-bank{
+  display:flex;flex-wrap:wrap;gap:8px;padding:12px;border-radius:20px;
+  background:#fffbeb;border:2px dashed #fbbf24;min-height:58px;align-items:center;
+}
+.w{
+  display:inline-flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,#fef08a,#fde047);color:#713f12;
+  border:2px solid #eab308;border-bottom:4px solid #ca8a04;border-radius:14px;
+  padding:8px 14px;cursor:grab;font-weight:900;font-size:14px;
+  touch-action:none;user-select:none;-webkit-user-select:none;
+  transition:transform .15s, box-shadow .15s, opacity .15s;
+}
+.w:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 6px 14px rgba(234,179,8,.28)}
+.w.sel{background:linear-gradient(135deg,#818cf8,#6366f1);color:#fff;border-color:#4f46e5;border-bottom-color:#3730a3;transform:scale(1.06)}
+.w.dragging-src{opacity:.28;transform:scale(.95)}
+.w.placed{background:linear-gradient(135deg,#dbeafe,#bfdbfe);color:#1e3a8a;border-color:#60a5fa;border-bottom-color:#2563eb;cursor:pointer}
+.w.placed .rm{
+  background:rgba(255,255,255,.7);color:#1e40af;border-radius:50%;
+  width:20px;height:20px;display:inline-flex;align-items:center;justify-content:center;font-size:11px;
+}
+
+.drag-ghost{
+  position:fixed;z-index:1000;pointer-events:none;
+  background:linear-gradient(135deg,#fef08a,#facc15);color:#713f12;
+  border:3px solid #ca8a04;border-radius:16px;padding:10px 18px;
+  font-weight:900;font-size:15px;white-space:nowrap;
+  box-shadow:0 18px 34px rgba(15,23,42,.26);
+  transform:translate(-50%,-50%) rotate(-5deg) scale(1.1);
+}
+
+.slots{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));gap:12px;margin-top:12px}
+.slot{
+  border:3px dashed #6ee7b7;background:#f0fdf4;border-radius:22px;padding:10px;
+  text-align:center;min-height:92px;display:flex;flex-direction:column;justify-content:space-between;gap:8px;
+  transition:transform .18s cubic-bezier(.34,1.56,.64,1), background .18s, border-color .18s, box-shadow .18s;
+}
+.slot.drag-over{
+  background:#dcfce7;border-color:#059669;border-style:solid;
+  transform:scale(1.05);box-shadow:0 0 0 5px rgba(16,185,129,.25);
+}
+.slot.slot-ok{background:#ecfdf5;border-color:#10b981;border-style:solid}
+.slot.slot-bad{background:#fef2f2;border-color:#f87171;border-style:solid}
+.slot-drop-lbl{font-size:13px;font-weight:800;color:#059669;padding:8px 4px;border-radius:12px;background:rgba(255,255,255,.7)}
+
+.ans-reveal{
+  margin-top:6px;padding:5px 10px;border-radius:10px;
+  background:#dcfce7;color:#15803d;font-size:13px;font-weight:900;
+}
+.rev-score-box{
+  background:linear-gradient(135deg,#fef08a,#bbf7d0,#bae6fd);
+  border:3px solid #10b981;border-radius:24px;padding:16px;text-align:center;
+  margin-bottom:14px;animation:popCard .4s;
+}
+.rev-score-box .big-sc{font-size:28px;font-weight:900;color:#047857}
+
+.emo{font-size:26px;display:inline-block;animation:pop .35s cubic-bezier(.34,1.56,.64,1);vertical-align:middle;margin-left:6px}
+@keyframes pop{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+
+.tm{font-size:32px;font-weight:900;text-align:center;color:var(--accent);display:flex;align-items:center;justify-content:center;gap:8px}
+.hw-ico{font-size:84px;text-align:center;animation:bob 1.6s ease-in-out infinite}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-14px) rotate(6deg)}}
+.party{
+  text-align:center;font-size:19px;font-weight:900;
+  background:linear-gradient(135deg,#dcfce7,#fef9c3);
+  border:3px dashed #10b981;border-radius:24px;padding:18px;margin-top:12px;
+  animation:popCard .4s;
+}
+.pill-tag{
+  display:inline-block;font-size:13px;font-weight:900;color:#fff;
+  background:linear-gradient(135deg,#6366f1,#0ea5e9);
+  padding:4px 12px;border-radius:999px;margin-bottom:8px;
+}
+</style>
+</head>
+<body>
+<div class="float-bg">
+  <div class="fl">🌱</div><div class="fl">🍃</div><div class="fl">🌼</div><div class="fl">✨</div><div class="fl">🌿</div>
+</div>
+<canvas id="fxCanvas"></canvas>
+<main id="app"></main>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const L='АБВГД';
+
+const PEER_CFG={
+  debug:1,
+  config:{
+    iceServers:[
+      {urls:'stun:stun.l.google.com:19302'},
+      {urls:'stun:stun1.l.google.com:19302'},
+      {urls:'stun:stun2.l.google.com:19302'}
+    ]
+  }
+};
+
+function playSfx(type){
+  try{
+    const ctx=window._ac||(window._ac=new (window.AudioContext||window.webkitAudioContext)());
+    if(ctx.state==='suspended') ctx.resume();
+    const o=ctx.createOscillator(), g=ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    const now=ctx.currentTime;
+    if(type==='ok'){
+      o.type='triangle'; o.frequency.setValueAtTime(523,now);
+      o.frequency.setValueAtTime(659,now+.08); o.frequency.setValueAtTime(784,now+.16);
+      g.gain.setValueAtTime(.18,now); g.gain.exponentialRampToValueAtTime(.001,now+.34);
+      o.start(now); o.stop(now+.35);
+    }else if(type==='pop'){
+      o.type='sine'; o.frequency.setValueAtTime(420,now);
+      o.frequency.exponentialRampToValueAtTime(680,now+.07);
+      g.gain.setValueAtTime(.12,now); g.gain.exponentialRampToValueAtTime(.001,now+.09);
+      o.start(now); o.stop(now+.1);
+    }
+  }catch(e){}
+}
+
+const fxP=[];
+function burstConfetti(cx,cy,count=28){
+  const cv=$('#fxCanvas');
+  cv.width=innerWidth; cv.height=innerHeight;
+  const cols=['#10b981','#38bdf8','#facc15','#f472b6','#818cf8','#fb923c'];
+  for(let i=0;i<count;i++){
+    const ang=Math.random()*Math.PI*2, sp=3+Math.random()*7;
+    fxP.push({
+      x:cx??innerWidth/2, y:cy??innerHeight/2,
+      vx:Math.cos(ang)*sp, vy:Math.sin(ang)*sp-3,
+      sz:6+Math.random()*6, c:cols[i%cols.length], life:1, rot:Math.random()*6, vr:(Math.random()-.5)*.25
+    });
+  }
+  if(!window._fxRun) runFx();
+}
+function runFx(){
+  window._fxRun=true;
+  const cv=$('#fxCanvas'), ctx=cv.getContext('2d');
+  (function loop(){
+    ctx.clearRect(0,0,cv.width,cv.height);
+    for(let i=fxP.length-1;i>=0;i--){
+      const p=fxP[i];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=.22; p.rot+=p.vr; p.life-=.022;
+      if(p.life<=0){fxP.splice(i,1);continue}
+      ctx.save(); ctx.globalAlpha=p.life; ctx.translate(p.x,p.y); ctx.rotate(p.rot);
+      ctx.fillStyle=p.c; ctx.fillRect(-p.sz/2,-p.sz/2,p.sz,p.sz*.65); ctx.restore();
+    }
+    if(fxP.length) requestAnimationFrame(loop);
+    else window._fxRun=false;
+  })();
+}
+
+const T={
+  root:[
+    {id:'r1',k:'place',q:'Холбоо үгийг зургийн доор зөв байрлуул',n:5,words:['Голлосон үндэс','Сахлаг үндэс','Голлосон үндэс','Нэмэлт үндэс','Голлосон үндэс'],ans:['Сахлаг үндэс','Голлосон үндэс','Нэмэлт үндэс','Голлосон үндэс','Голлосон үндэс'],ord:[0,1,2,3,4]},
+    {id:'r2',k:'match',q:'Зөв харгалзуулна уу.',rows:['Ургамлын иш, үндэслэг иш, навч зэрэг бие гүйцсэн эрхтнүүд дээр үүсч байгаа үндсийг ... гэнэ.','Ургамлын үндэс нэг хэвийн олон нэмэлт үндэснээс бүрдсэн байвал ... гэнэ.','Гол үндэс нь бусдаас илүү урт, бүдүүн байвал түүнийг ... гэнэ.','Гол үндэсний хажуугийн салаануудыг ... гэнэ.'],opts:['А. Сахлаг үндэс','Б. Хажуугийн үндэс','В. Нэмэлт үндэс','Г. Голлосон үндэс'],ans:'ВАГБ'}
+  ],
+  stem:[
+    {id:'s1',k:'mcq',q:'Ишийн навч гарсан хэсгийг юу гэх вэ?',opts:['Нахиа','Үе','Зайдмал','Найлзуур'],ans:'Б'},
+    {id:'s2',k:'mcq',q:'Өөрийн гадаргуу дээр навч төрүүлэх эрхтнийг ... гэнэ.',opts:['Иш','Үе','Зайдмал','Нахиа'],ans:'А'},
+    ...[3,4,5].map(i=>({id:'s'+i,k:'mcq',img:1,q:'Зурагт ишний ямар бүтцийн хэсгийг харуулсан байна вэ?',opts:['Үе','Зайдмал','Хажуугийн нахиа','Оройн нахиа']}))
+  ],
+  leaf:[
+    {id:'l1',k:'mcq',img:1,q:'Навчны гадаад бүтцийн зурагт В үсгээр ямар хэсгийг заасан бэ?',opts:['Илтэс','Орой','Бариул','Дагавар навч']},
+    {id:'l2',k:'mcq',img:1,q:'Навчны гадаад бүтцийн зурагт Д үсгээр ямар хэсгийг заасан бэ?',opts:['Илтэс','Орой','Бариул','Дагавар навч']},
+    {id:'l3',k:'mcq',img:1,q:'Навчны зургийг анхааралтай ажиглаад зөв нэрлээрэй.',opts:['Суумал навч','Бариултай навч']},
+    {id:'l4',k:'match',q:'Зөв харгалзуулаарай.',rows:['Ургамлын иш дээр үүсэн ургаж амьсгалах, ууршуулах, шим бодис бүрдүүлэх эрхтнийг ... гэнэ.','Навчны өргөн хавтгай хэсгийг ... гэнэ.','Бариулгүй навчийг ... гэнэ.'],opts:['А. Илтэс','Б. Суумал навч','В. Навч'],ans:'ВАБ'},
+    {id:'l5',k:'place',q:'Навчны хэлбэрүүдийг зөв нэрлээрэй.',n:5,words:['Шугаман навч','Зууван навч','Дугуй навч','Гонзгой навч','Өндгөрхүү навч'],ans:['Шугаман навч','Зууван навч','Дугуй навч','Гонзгой навч','Өндгөрхүү навч'],ord:[2,0,4,1,3]}
+  ],
+  exam:[
+    {id:'e1',k:'match',img:1,q:'Зургийг ажиглаад харгалзуулах даалгаврыг гүйцэтгээрэй.',rows:['Бариул','Илтэс','Үзүүр','Дагавар навч','Суурь'],opts:['А','Б','В','Г','Д']},
+    {id:'e2',k:'mcq',img:1,q:'Зурагт ишний бүтцийн ямар хэсгийг заасан байна вэ?',opts:['Хажуугийн нахиа, оройн нахиа','Үе, зайдмал','Навч, найлзуур','Үе, нахиа']},
+    {id:'e3',k:'mcq',img:1,q:'Зурагт ямар хэлбэртэй навчийг үзүүлсэн байна вэ?',opts:['Зууван навч','Өндгөрхүү навч','Гонзгой навч','Дугуй навч']},
+    {id:'e4',k:'mcq',img:1,q:'Зурагт үзүүлсэн үндэсний хэлбэрийг нэрлэнэ үү.',opts:['Сахлаг үндэс','Голлосон үндэс','Хажуугийн үндэс','Нэмэлт үндэс']},
+    {id:'e5',k:'mcq',img:1,q:'Зурагт үзүүлсэн үндэсний хэлбэрийг нэрлэнэ үү.',opts:['Сахлаг үндэс','Голлосон үндэс','Хажуугийн үндэс','Нэмэлт үндэс']}
+  ]
+};
+const PRAC_ALL=[...T.root,...T.stem,...T.leaf];
+const NAMES={root:'🌿 Үндэс',stem:'🎋 Иш',leaf:'🍃 Навч'};
+const TXT={
+  z:['🎯 Зорилго','Ургамлын ургал эрхтнүүд болох үндэс, иш, навчийн бүтэц, үүргийг тайлбарлана. Үндэс, ишний хэлбэр, навчны хэсгүүдийг зураг дээр нэрлэж, ялгаж сурна. Ажиглалт, харьцуулалтаар дүгнэлт гаргаж чадна.'],
+  s:['✨ Сэдэлжүүлэлт','Видеог үзээд ургамал яагаад үндэс, иш, навчтай байдаг вэ гэдгийг ярилцъя. Ургамлын аль хэсэг нь юу хийдэг гэж бодож байна вэ? Өөрийн санааг хуваалцаарай.']
+};
+const INFO={
+  root:'Үндэс нь ургамлыг хөрсөнд бэхэлж, ус болон эрдэс бодис шимнэ. Голлосон, сахлаг, нэмэлт үндэс гэж ялгана.',
+  stem:'Иш нь навч, цэцэг, жимсийг тэтгэж, бодисыг зөөвөрлөнө. Үе, зайдмал, нахиа зэрэг хэсэгтэй.',
+  leaf:'Навч нь фотосинтез хийж, амьсгалж, ууршуулна. Илтэс, бариул, дагавар навчтай. Бариултай болон суумал навч байдаг.'
+};
+
+const params=new URLSearchParams(location.search);
+const hostId=params.get('r')||params.get('room')||'';
+
+let M={};
+const S={
+  connected:false,joined:false,avatar:'🌱',name:'',
+  started:false,pg:'lobby',sub:'root',
+  revPrac:false,revExam:false,
+  tab:'root',ans:{},sel:null,t0:0,btDone:false,
+  exOn:false,exDone:false,exAns:{},exEnd:0
+};
+
+let peer=null,conn=null,retryTimer=null;
+
+function scheduleRetry(){
+  if(!hostId)return;
+  clearTimeout(retryTimer);
+  retryTimer=setTimeout(()=>{if(!S.connected) connectHost()},2500);
+}
+
+function connectHost(){
+  if(!hostId)return;
+  if(peer)try{peer.destroy()}catch(e){}
+  peer=new Peer(PEER_CFG);
+  peer.on('open',()=>{
+    conn=peer.connect(hostId,{reliable:true});
+    conn.on('open',()=>{
+      S.connected=true;
+      clearTimeout(retryTimer);
+      if(S.joined&&S.name) conn.send({type:'join',name:S.name});
+      render();
+    });
+    conn.on('data',msg=>{
+      if(!msg||!msg.type)return;
+      if(msg.type==='welcome'){
+        S.avatar=msg.avatar||'🌱';
+        applyState(msg.state);
+        if(S.joined&&S.name&&conn&&conn.open) conn.send({type:'join',name:S.name});
+        render();
+      }
+      if(msg.type==='sync'){
+        applyState(msg.state);
+        render();
+      }
+      if(msg.type==='media_item'){
+        if(msg.v===null) delete M[msg.k];
+        else M[msg.k]=msg.v;
+        render();
+      }
+    });
+    conn.on('close',()=>{S.connected=false;render();scheduleRetry()});
+    conn.on('error',()=>{S.connected=false;scheduleRetry()});
+  });
+  peer.on('error',()=>{S.connected=false;scheduleRetry()});
+}
+
+function applyState(st){
+  if(!st)return;
+  const justRevPrac=!S.revPrac && !!st.revPrac;
+  const justRevExam=!S.revExam && !!st.revExam;
+  S.started=!!st.started;
+  S.pg=st.pg||'lobby';
+  S.sub=st.sub||'root';
+  S.revPrac=!!st.revPrac;
+  S.revExam=!!st.revExam;
+  if(S.pg==='b'&&!S.t0) S.t0=Date.now();
+  if(S.revExam && S.exOn){S.exOn=false;S.exDone=true;S.exEnd=0;sendProgress('exam',true)}
+  if((justRevPrac&&S.pg==='b')||(justRevExam&&S.pg==='u')){
+    playSfx('ok');
+    burstConfetti(innerWidth/2,innerHeight/3,40);
+  }
+}
+
+const key=t=>(M['a_'+t.id]||'').replace(/\s/g,'').toUpperCase();
+const A=t=>t.ans!==undefined?t.ans:key(t);
+function ok(t,a){
+  a=a||S.ans[t.id];if(!a)return false;
+  if(t.k==='mcq')return a===A(t);
+  if(t.k==='match')return Array.isArray(a)&&a.join('')===A(t);
+  return t.ans.every((w,i)=>t.words[a[i]]===w);
+}
+function isAnswered(t,a){
+  if(!a)return false;
+  if(t.k==='mcq')return Boolean(a);
+  if(t.k==='match')return Array.isArray(a)&&a.filter(Boolean).length===t.rows.length;
+  return Array.isArray(a)&&a.filter(x=>x!=null).length===t.n;
+}
+
+function sendProgress(mode,done=false){
+  if(!conn||!conn.open)return;
+  if(mode==='practice'){
+    const sc=PRAC_ALL.filter(t=>ok(t,S.ans[t.id])).length;
+    const sec=S.t0?Math.round((Date.now()-S.t0)/1000):0;
+    conn.send({type:'progress',mode:'practice',name:S.name,score:sc,total:PRAC_ALL.length,sec,done});
+  }else if(mode==='exam'){
+    const sc=T.exam.filter(t=>ok(t,S.exAns[t.id])).length;
+    conn.send({type:'progress',mode:'exam',name:S.name,score:sc,total:T.exam.length,pct:sc*20,done});
+  }
+}
+
+function renderMedia(k){
+  const v=M[k];if(!v)return '';
+  if(v.t==='d'||v.t==='yt'||v.t==='v'){
+    return `<div class="board-video">
+      <div class="bv-ico">🎬📺</div>
+      <div class="bv-title">Видеог самбараас үзнэ үү!</div>
+      <div class="bv-sub">Интернэт гацахаас сэргийлж видео зөвхөн багшийн дэлгэц дээр тоглож байна ✨</div>
+    </div>`;
+  }
+  return `<div class="ms"><img src="${v.u}" alt=""></div>`;
+}
+
+function renderTask(t,isExam,store,reveal){
+  const a=store[t.id];
+  const rightKey=A(t);
+  let h=`<div class="card"><div class="q-title">🧩 ${t.q}</div>`;
+  if(t.img) h+=renderMedia('i_'+t.id);
+
+  if(t.k==='mcq'){
+    h+=`<div class="opt-grid">`+t.opts.map((o,i)=>{
+      const val=L[i];
+      const picked=a===val;
+      const isAns=val===rightKey;
+      let cls='opt', ic='';
+      if(!reveal){
+        if(picked){cls+=' picked'; ic='☑️'}
+      }else{
+        if(isAns){cls+=' on'; ic=picked?'😄 ✅':'✅ Зөв'}
+        else if(picked){cls+=' bad'; ic='😢 ❌'}
+      }
+      return `<button class="${cls}" ${reveal?'disabled':''} onclick="pickMcq('${t.id}','${val}',${isExam})">
+        <span class="letter">${val}</span>
+        <span>${o}</span>
+        <span class="check-ic">${ic}</span>
+      </button>`;
+    }).join('')+`</div>`;
+  }
+
+  if(t.k==='match'){
+    h+=t.rows.map((r,i)=>{
+      const v=(a||[])[i]||'';
+      const rightAns=(rightKey||'')[i]||'';
+      const rowState=reveal?(v===rightAns?'ok-row':'bad-row'):'';
+      return `<div class="match-row ${rowState}">
+        <div class="match-q">${i+1}. ${r} ${reveal?`<span class="emo" style="font-size:20px">${v===rightAns?'😄':'😢'}</span>`:''}</div>
+        <div class="match-picks">
+          ${t.opts.map((o,j)=>{
+            const val=L[j];
+            const isSel=v===val;
+            let cls='mpick';
+            if(!reveal){
+              if(isSel) cls+=' picked';
+            }else{
+              if(val===rightAns) cls+=' ok-pick';
+              else if(isSel) cls+=' bad-pick';
+            }
+            return `<button class="${cls}" ${reveal?'disabled':''} onclick="pickMatch('${t.id}',${i},'${val}',${isExam})">${o}</button>`;
+          }).join('')}
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  if(t.k==='place'){
+    const u=a||[];
+    const free=t.words.map((w,i)=>u.includes(i)?'':`<span class="w ${reveal?'':'draggable'} ${!reveal&&S.sel===t.id+':'+i?'sel':''}" data-task="${t.id}" data-word="${i}" data-exam="${isExam?1:0}">✋ ${w}</span>`).join('');
+    if(!reveal){
+      h+=`<div class="drag-hint">👆 Үгийг чирж зургийн доор тавиарай (эсвэл дарж сонгоод нүдэн дээр дар)</div>
+        <div class="word-bank">${free||'<span style="font-weight:900;color:#059669">✅ Бүх үгийг байрлууллаа!</span>'}</div>`;
+    }
+    h+=`<div class="slots">${t.ord.map(i=>{
+        const w=u[i];
+        const hasW=w!=null;
+        const isGood=hasW&&t.words[w]===t.ans[i];
+        const slotCls=reveal?(isGood?'slot-ok':'slot-bad'):'';
+        return `<div class="slot ${slotCls}" data-slot-task="${t.id}" data-slot-idx="${i}" data-exam="${isExam?1:0}" onclick="${reveal?'':`putWord('${t.id}',${i},${isExam})`}">
+          ${renderMedia(t.id+'_'+i)}
+          <div>
+            ${hasW
+              ? `<span class="w placed">${t.words[w]}${reveal?'':' <span class="rm">✕</span>'}</span> ${reveal?`<span class="emo" style="font-size:22px">${isGood?'😄':'😢'}</span>`:''}`
+              : (reveal?`<span style="font-size:13px;font-weight:800;color:#b91c1c">Хариулаагүй 😢</span>`:`<div class="slot-drop-lbl">⬇️ Энд чирж тавь</div>`)}
+            ${reveal&&!isGood?`<div class="ans-reveal">✅ ${t.ans[i]}</div>`:''}
+          </div>
+        </div>`;
+      }).join('')}</div>`;
+  }
+  return h+'</div>';
+}
+
+let drag=null;
+document.addEventListener('pointerdown',e=>{
+  const el=e.target.closest('.w.draggable');
+  if(!el)return;
+  const isExam=el.dataset.exam==='1';
+  if((isExam&&S.revExam)||(!isExam&&S.revPrac))return;
+  drag={
+    el,
+    taskId:el.dataset.task,
+    wordIdx:+el.dataset.word,
+    isExam,
+    text:el.textContent.trim(),
+    sx:e.clientX, sy:e.clientY,
+    moved:false, ghost:null, overSlot:null
+  };
+  el.setPointerCapture(e.pointerId);
+});
+
+document.addEventListener('pointermove',e=>{
+  if(!drag)return;
+  const dx=e.clientX-drag.sx, dy=e.clientY-drag.sy;
+  if(!drag.moved && Math.hypot(dx,dy)>6){
+    drag.moved=true;
+    drag.el.classList.add('dragging-src');
+    const g=document.createElement('div');
+    g.className='drag-ghost';
+    g.textContent=drag.text;
+    document.body.appendChild(g);
+    drag.ghost=g;
+    playSfx('pop');
+  }
+  if(drag.moved && drag.ghost){
+    drag.ghost.style.left=e.clientX+'px';
+    drag.ghost.style.top=e.clientY+'px';
+    const els=document.elementsFromPoint(e.clientX,e.clientY);
+    const slot=els.find(x=>x.classList&&x.classList.contains('slot')&&x.dataset.slotTask===drag.taskId);
+    if(drag.overSlot&&drag.overSlot!==slot) drag.overSlot.classList.remove('drag-over');
+    drag.overSlot=slot||null;
+    if(drag.overSlot) drag.overSlot.classList.add('drag-over');
+  }
+});
+
+function endDrag(){
+  if(!drag)return;
+  const d=drag; drag=null;
+  d.el.classList.remove('dragging-src');
+  if(d.ghost) d.ghost.remove();
+  if(d.overSlot) d.overSlot.classList.remove('drag-over');
+
+  if(!d.moved){
+    selectWord(d.taskId,d.wordIdx);
+    return;
+  }
+  if(d.overSlot){
+    const slotIdx=+d.overSlot.dataset.slotIdx;
+    placeWordDirect(d.taskId,slotIdx,d.wordIdx,d.isExam);
+  }
+}
+document.addEventListener('pointerup',endDrag);
+document.addEventListener('pointercancel',endDrag);
+
+function placeWordDirect(id,slotIdx,wordIdx,isExam){
+  if((isExam&&S.revExam)||(!isExam&&S.revPrac))return;
+  const sc=isExam?S.exAns:S.ans;
+  if(!sc[id])sc[id]=[];
+  sc[id][slotIdx]=wordIdx;
+  S.sel=null;
+  playSfx('pop');
+  sendProgress(isExam?'exam':'practice',false);
+  render();
+}
+
+window.pickMcq=(id,v,isExam)=>{
+  if((isExam&&S.revExam)||(!isExam&&S.revPrac))return;
+  (isExam?S.exAns:S.ans)[id]=v;
+  playSfx('pop');
+  sendProgress(isExam?'exam':'practice',false);render();
+};
+window.pickMatch=(id,i,v,isExam)=>{
+  if((isExam&&S.revExam)||(!isExam&&S.revPrac))return;
+  const sc=isExam?S.exAns:S.ans;
+  if(!sc[id])sc[id]=[];
+  sc[id][i]=v;
+  playSfx('pop');
+  sendProgress(isExam?'exam':'practice',false);render();
+};
+window.selectWord=(id,i)=>{
+  if(S.revPrac&&S.pg==='b')return;
+  if(S.revExam&&S.pg==='u')return;
+  playSfx('pop');
+  S.sel=(S.sel===id+':'+i)?null:(id+':'+i);
+  render();
+};
+window.putWord=(id,i,isExam)=>{
+  if((isExam&&S.revExam)||(!isExam&&S.revPrac))return;
+  const sc=isExam?S.exAns:S.ans;if(!sc[id])sc[id]=[];
+  if(sc[id][i]!=null){
+    sc[id][i]=null; playSfx('pop');
+    sendProgress(isExam?'exam':'practice',false);render();
+  }else if(S.sel&&S.sel.startsWith(id+':')){
+    const wi=+S.sel.split(':')[1];
+    placeWordDirect(id,i,wi,isExam);
+  }
+};
+
+window.doJoin=()=>{
+  const inp=$('#stuName');
+  const nm=(inp?inp.value:S.name).trim();
+  if(!nm){alert('Нэрээ бичнэ үү!');return}
+  S.name=nm;S.joined=true;
+  playSfx('ok'); burstConfetti(innerWidth/2,innerHeight/3,32);
+  if(conn&&conn.open) conn.send({type:'join',name:S.name});
+  render();
+};
+window.submitPractice=()=>{
+  const ansCnt=PRAC_ALL.filter(t=>isAnswered(t,S.ans[t.id])).length;
+  if(ansCnt<PRAC_ALL.length){
+    if(!confirm(`Чи одоогоор ${ansCnt}/${PRAC_ALL.length} даалгавар бөглөсөн байна. Илгээх үү?`)) return;
+  }
+  S.btDone=true;playSfx('ok');burstConfetti(innerWidth/2,innerHeight/2,45);
+  sendProgress('practice',true);render();
+};
+window.startExam=()=>{playSfx('pop');S.exOn=true;S.exAns={};S.exEnd=Date.now()+300000;render()};
+window.finishExam=()=>{
+  if(!S.exOn)return;
+  S.exOn=false;S.exDone=true;S.exEnd=0;
+  playSfx('ok');burstConfetti(innerWidth/2,innerHeight/2,45);
+  sendProgress('exam',true);render();
+};
+
+setInterval(()=>{
+  const e=$('#tm');
+  if(!e||!S.exEnd)return;
+  const s=Math.max(0,Math.round((S.exEnd-Date.now())/1000));
+  e.textContent=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+  if(s===0) finishExam();
+},500);
+
+function render(){
+  const app=$('#app');
+  if(!hostId){
+    app.innerHTML=`<div class="card join-wrap">
+      <div class="big-avatar">📱</div>
+      <h2 style="justify-content:center">QR кодоор нэвтэрнэ үү</h2>
+      <p style="color:var(--muted);font-weight:700">Багшийн дэлгэц дээрх QR кодыг уншуулж эсвэл багшийн илгээсэн холбоосоор орно уу 🌱</p>
+    </div>`;
+    return;
+  }
+  if(!S.joined){
+    app.innerHTML=`<div class="card join-wrap">
+      <div class="big-avatar">${S.avatar}</div>
+      <h2 style="justify-content:center">Сайн байна уу! 👋</h2>
+      <p style="color:var(--muted);font-weight:700">${S.connected?'Чиний хөөрхөн дүрс сонгогдлоо! Одоо нэрээ бичээрэй.':'Багшийн самбартай холбогдож байна...'}</p>
+      <input class="big-in" id="stuName" value="${esc(S.name)}" placeholder="Өөрийн нэрээ бич" onkeydown="if(event.key==='Enter')doJoin()">
+      <button class="primary" style="font-size:19px;padding:14px 36px" onclick="doJoin()" ${S.connected?'':'disabled'}>🚀 Нэгдэх</button>
+    </div>`;
+    return;
+  }
+
+  let top=`<div class="topbar">
+    <div class="me-pill"><span class="av">${S.avatar}</span><span>${esc(S.name)}</span></div>
+    <div class="conn-badge ${S.connected?'':'wait'}">${S.connected?'🟢 Холбогдсон':'🟡 Холбогдож байна...'}</div>
+  </div>`;
+
+  if(!S.started||S.pg==='lobby'){
+    app.innerHTML=top+`<div class="card join-wrap">
+      <div class="big-avatar">${S.avatar}</div>
+      <h2 style="justify-content:center">Амжилттай нэгдлээ! 🎉</h2>
+      <p style="font-size:17px;color:var(--muted);font-weight:700">Багш <b>«Хичээл эхлэх»</b> товчийг дарахыг хүлээж байна... ⏳</p>
+    </div>`;
+    return;
+  }
+
+  if(S.pg==='z'||S.pg==='s'){
+    app.innerHTML=top+`<div class="card">
+      <h2>${TXT[S.pg][0]}</h2>
+      <p style="font-size:17px;line-height:1.65;font-weight:700">${TXT[S.pg][1]}</p>
+      ${renderMedia(S.pg==='z'?'vz':'vs')}
+    </div>`;
+    return;
+  }
+  if(S.pg==='n'){
+    app.innerHTML=top+`<div class="card">
+      <span class="pill-tag">📖 Шинэ мэдлэг</span>
+      <h2>${NAMES[S.sub]}</h2>
+      <p style="font-size:17px;line-height:1.65;font-weight:700">${INFO[S.sub]}</p>
+      ${renderMedia('nv_'+S.sub)}
+      ${renderMedia('ni_'+S.sub)}
+    </div>`;
+    return;
+  }
+  if(S.pg==='b'){
+    const ansCnt=PRAC_ALL.filter(t=>isAnswered(t,S.ans[t.id])).length;
+    const sc=PRAC_ALL.filter(t=>ok(t,S.ans[t.id])).length;
+    const pct=Math.round(((S.revPrac?sc:ansCnt)/PRAC_ALL.length)*100);
+    app.innerHTML=top+
+      (S.revPrac?`<div class="rev-score-box"><div style="font-weight:900;color:#4338ca">👁️ Багш зөв хариуг нээлээ!</div><div class="big-sc">🏆 Чиний оноо: ${sc} / ${PRAC_ALL.length}</div></div>`:'')+
+      `<div class="card">
+        <h2>💪 Бататгах дасгал</h2>
+        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:800;color:var(--muted)">
+          <span>${S.revPrac?'Зөв хийсэн':'Бөглөсөн явц'}</span>
+          <span>${S.revPrac?`⭐ ${sc}/${PRAC_ALL.length} (${pct}%)`:`📝 ${ansCnt}/${PRAC_ALL.length}`}</span>
+        </div>
+        <div class="prog-wrap"><div class="prog-fill" style="width:${pct}%"></div></div>
+        <div class="tabs">
+          ${['root','stem','leaf'].map(x=>`<button class="${S.tab===x?'on':''}" onclick="S.tab='${x}';playSfx('pop');render()">${NAMES[x]}</button>`).join('')}
+        </div>
+      </div>`+
+      T[S.tab].map(t=>renderTask(t,false,S.ans,S.revPrac)).join('')+
+      (!S.revPrac?`<div class="card" style="text-align:center">
+        <div style="font-size:17px;font-weight:800;margin-bottom:12px">Бөглөсөн даалгавар: <b style="color:var(--primary-d)">${ansCnt}/${PRAC_ALL.length}</b> (Үндэс, Иш, Навч)</div>
+        <button class="primary" style="font-size:19px;padding:14px 34px" onclick="submitPractice()">📤 Багшид илгээх</button>
+        ${S.btDone?'<div class="party">✅ Амжилттай илгээлээ! Багш зөв хариуг нээхэд энд харагдана 🌟</div>':''}
+      </div>`:'');
+    return;
+  }
+  if(S.pg==='u'){
+    if(S.revExam){
+      const sc=T.exam.filter(t=>ok(t,S.exAns[t.id])).length;
+      app.innerHTML=top+
+        `<div class="rev-score-box">
+          <div style="font-weight:900;color:#4338ca">👁️ Багш шалгалтын зөв хариуг нээлээ!</div>
+          <div class="big-sc">🏆 Чиний дүн: ${sc}/5 (${sc*20}%)</div>
+        </div>`+
+        T.exam.map(t=>renderTask(t,true,S.exAns,true)).join('');
+      return;
+    }
+    if(S.exDone){
+      app.innerHTML=top+`<div class="card"><div class="party">✅ 5 минутын шалгалтыг амжилттай илгээлээ!<br><span style="font-size:15px;color:#475569">Багш «Зөв хариуг харах» товчийг дарахад чиний дүн болон зөв хариу энд харагдана 🌟</span></div></div>`;
+      return;
+    }
+    if(!S.exOn){
+      app.innerHTML=top+`<div class="card join-wrap">
+        <div class="big-avatar">📝</div>
+        <h2 style="justify-content:center">5 минутын шалгалт</h2>
+        <p style="color:var(--muted);font-weight:700">Нийт 5 даалгавартай, 5 минутын хугацаатай. Амжилт хүсье!</p>
+        <button class="primary" style="font-size:19px;padding:15px 38px" onclick="startExam()">▶️ Шалгалт эхлэх</button>
+      </div>`;
+      return;
+    }
+    app.innerHTML=top+`<div class="card"><div class="tm">⏳ <span id="tm">5:00</span></div></div>`+
+      T.exam.map(t=>renderTask(t,true,S.exAns,false)).join('')+
+      `<div class="card" style="text-align:center"><button class="primary" style="font-size:19px;padding:15px 38px" onclick="finishExam()">📤 Шалгалт дуусгах</button></div>`;
+    return;
+  }
+  if(S.pg==='g'){
+    app.innerHTML=top+`<div class="card" style="text-align:center;padding:34px 18px">
+      <div class="hw-ico">📚✏️</div>
+      <h2 style="justify-content:center">🏠 Гэрийн даалгавар</h2>
+      <p style="font-size:19px;font-weight:800;line-height:1.5">Сурах бичгийн хуудас 61, Туршилт 5-г гүйцэтгэж ирээрэй. 🌱</p>
+    </div>`;
+  }
+}
+
+connectHost();
+render();
+</script>
+</body>
+</html>
